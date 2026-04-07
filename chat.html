@@ -1,0 +1,222 @@
+<!--------------------<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device", initial-scale="1.0">
+        <title>Chat App</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="person-selector">
+            <button class="button person-selector-button active-person" id="john-selector">john</button>
+            <button class="button person-selector-button " id="jane-selector">jane</button>
+        </div>
+        <div class="chat-container">
+            <h2 class="chat-header">John chatting.........</h2>
+        
+            <div class="chat-messages">
+                <div class="Message blue-bg">
+                    <div class="Message-sender">John</div>  
+                    <div class="Message-text">Hey Jane, what's up?</div>                                                
+                    <div class="Message-timestamp">10.30 AM</div>
+                </div>
+              <div class="Message gray-bg">
+                 <div class="Message-sender">Jane</div>
+                 <div class="Message-text">Not much, just living the dream, now about you?</div>
+                 <div class="Message-timestamp">10.35 AM</div>
+              </div>
+            </div>
+             
+          <form class="chat-inut-form">
+             <input type="text" class="chat-input" required placeholder="Type here, John...." />
+             <button type="submit" class="button send-button">send</button>
+          </form>
+            <button class="button clear-chat-button"> Clear chat</button>
+        </div>
+
+        <script src="one.js"></script>
+    </body>
+</html>
+------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rabbit Flower Shop</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fefaf6; margin:0; }
+    .chatbot-icon {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 80px; height: 80px; cursor: pointer;
+    }
+    .chatbot-box {
+      position: fixed; bottom: 120px; right: 20px;
+      width: 300px; height: 400px;
+      border: 2px solid #ddd; border-radius: 12px;
+      background: #fff; display: none; flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #chat-body { flex: 1; padding: 10px; overflow-y: auto; }
+    #chat-input { display: flex; border-top: 1px solid #ddd; }
+    #chat-input input { flex: 1; padding: 10px; border: none; }
+    #chat-input button { padding: 10px; border: none; background: #ff69b4; color:#fff; cursor: pointer; }
+    #voice-btn { background: #4caf50; margin-left: 5px; }
+  </style>
+</head>
+<body>
+
+  <!-- Rabbit Icon -->
+  <img src="images/chatbot.jpg" alt="Rabbit" class="chatbot-icon" id="chatbot-icon">
+
+  <!-- Chatbox -->
+  <div class="chatbot-box" id="chatbot-box">
+    <div id="chat-body"></div>
+    <div id="chat-input">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+      <button id="voice-btn">🎤</button>
+    </div>
+  </div>
+
+<script>
+    let conversationStep = 0;
+    let selectedFlower = "";
+    let selectedColor = "";
+    let quantity = "";
+
+    // ✅ Toggle chatbox when clicking rabbit
+    document.getElementById("chatbot-icon").onclick = () => {
+      const box = document.getElementById("chatbot-box");
+      box.style.display = (box.style.display === "none" || box.style.display === "") ? "flex" : "none";
+    };
+
+
+
+
+let idleTimer;
+
+// Reset timer every time user sends message
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+
+  idleTimer = setTimeout(() => {
+    botFollowUp();
+  }, 10000); // 10 seconds (you can change)
+}
+
+// Bot follow-up message
+function botFollowUp() {
+  let message = "";
+
+  if (conversationStep === 1) {
+    message = "😊 Still there? Tell me which flower you like 🌹🌼🌷";
+  } 
+  else if (conversationStep === 2) {
+    message = "🤔 How many flowers do you need?";
+  } 
+  else if (conversationStep === 3) {
+    message = "✅ Shall I confirm your order?";
+  } 
+  else {
+    message = "👋 Hi! I'm here if you need flowers 💐";
+  }
+
+  addMessage("Rabbit", message);
+}
+    function sendMessage(msg = "") {
+      const input = document.getElementById("userInput");
+      let message = msg || input.value.trim();
+      if (message === "") return;
+
+      addMessage("You", message);
+
+      const response = generateResponse(message);
+      setTimeout(() => addMessage("Rabbit", response), 500);
+
+      input.value = "";
+    }
+
+    function generateResponse(msg) {
+      msg = msg.toLowerCase();
+      let response = "";
+
+      // Step 0 → Greeting
+      if (conversationStep === 0) {
+        if (
+          msg.includes("hi") || 
+          msg.includes("hello") || 
+          msg.includes("good morning") || 
+          msg.includes("good evening") || 
+          msg.includes("good night")
+        ) {
+          conversationStep = 1;
+          response = "Hello 👋 What do you want today? Roses 🌹, lilies 🌼, or tulips 🌷?";
+        } else {
+          response = "Hi 👋 Say 'hello' or'good morning'  to start chatting!";
+        }
+      }
+
+      // Step 1 → Choose flower + color
+      else if (conversationStep === 1) {
+        if (msg.includes("rose") || msg.includes("roses")) {
+          selectedFlower = "roses";
+          selectedColor = msg.includes("red") ? "red" : (msg.includes("white") ? "white" : "any");
+          conversationStep = 2;
+          response = `Ok, you want ${selectedColor} ${selectedFlower}. How many do you want?`;
+        } 
+        else if (msg.includes("lily") || msg.includes("lilies")) {
+          selectedFlower = "lilies";
+          selectedColor = msg.includes("pink") ? "pink" : (msg.includes("white") ? "white" : "any");
+          conversationStep = 2;
+          response = `Lovely! ${selectedColor} ${selectedFlower} 🌼. How many should I prepare?`;
+        } 
+        else if (msg.includes("tulip") || msg.includes("tulips")) {
+          selectedFlower = "tulips";
+          selectedColor = msg.includes("yellow") ? "yellow" : (msg.includes("purple") ? "purple" : "any");
+          conversationStep = 2;
+          response = `Great choice 🌷 ${selectedColor} ${selectedFlower}. How many do you want?`;
+        } 
+        else {
+          response = "Please tell me which flower 🌸 you want (roses, lilies, tulips).";
+        }
+      }
+
+      // Step 2 → Quantity
+      else if (conversationStep === 2) {
+        let num = msg.match(/\d+/); // extract number
+        if (num) {
+          quantity = num[0];
+          conversationStep = 3;
+          response = `Got it ✅ ${quantity} ${selectedColor} ${selectedFlower}. Shall I confirm your order?`;
+        } else {
+          response = "Please tell me how many you want (e.g. 10 red roses).";
+        }
+      }
+
+      // Step 3 → Confirmation
+      else if (conversationStep === 3) {
+        if (msg.includes("yes")) {
+          response = `🎉 Order confirmed: ${quantity} ${selectedColor} ${selectedFlower}! Thank you 💐`;
+          conversationStep = 0; // reset
+        } else {
+          response = "Order not confirmed ❌. Do you want to start again?";
+          conversationStep = 0; // restart
+        }
+      }
+
+      return response;
+    }
+
+    function addMessage(sender, text) {
+      const chatBody = document.getElementById("chat-body");
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatBody.appendChild(msg);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
+
